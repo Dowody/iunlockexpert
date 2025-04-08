@@ -12,7 +12,7 @@ const slides = [
   {
     image: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd",
     icon: Unlock,
-    title: "Unlock Any Apple Device",
+    title: "Unlock Apple Devices",
     description: "Professional unlocking service for all Apple devices - iPhone, iPad, and MacBook."
   },
   {
