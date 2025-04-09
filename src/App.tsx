@@ -11,6 +11,8 @@ import DeviceCard from './components/DeviceCard';
 import SearchBar from './components/SearchBar';
 import HeaderSlider from './components/HeaderSlider';
 import Navigation from './components/Navigation';
+import TermsAndConditions from './components/TermsAndConditions';
+import IMEIChecker from './components/IMEIChecker';
 
 const appleDevices = {
   iphone: [
@@ -178,6 +180,8 @@ function HomePage() {
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       <HeaderSlider />
+      
+      <IMEIChecker />
 
       <div className="container mx-auto px-3 md:px-4 py-6 md:py-12">
         <div className="flex justify-center space-x-4 mb-6">
@@ -245,7 +249,8 @@ function HomePage() {
               We provide the safest, fastest, and most reliable phone unlocking service in the industry.
             </p>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 m
+d:gap-8">
             {benefits.map((benefit, index) => (
               <BenefitCard key={index} {...benefit} />
             ))}
@@ -327,6 +332,7 @@ function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/unlock/:model" element={<DeviceUnlock />} />
+      <Route path="/terms" element={<TermsAndConditions />} />
     </Routes>
   );
 }
