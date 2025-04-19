@@ -1,0 +1,6 @@
+{
+    "nodeModulesDir": "auto",
+    "imports": {
+      "linkedom": "npm:linkedom@0.16.8"
+    }
+  }
