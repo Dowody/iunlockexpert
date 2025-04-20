@@ -1,48 +1,59 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import http from 'http';
+import WebSocket from 'ws';
+import { processMessage } from './chatbot';  // Assuming chatbot processing function is in chatbot.js
 
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const server = http.createServer(app);  // Use http server to combine Express and WebSocket
+const wss = new WebSocket.Server({ server });
+
+const clients = new Map();
 
 app.use(cors());
 app.use(express.json());
 
+// WebSocket server logic
+wss.on('connection', (ws) => {
+  const id = Date.now();
+  const color = Math.floor(Math.random() * 360);
+  const metadata = { id, color };
+
+  clients.set(ws, metadata);
+
+  ws.on('message', async (message) => {
+    const response = await processMessage(message.toString());  // Integrating chatbot
+    ws.send(JSON.stringify({ type: 'bot', message: response }));
+  });
+});
+
+// IMEI validation and lookup endpoint
 function validateIMEI(imei) {
-  // Remove any non-digit characters
   const cleanIMEI = imei.replace(/\D/g, '');
 
-  // Check length
   if (cleanIMEI.length !== 15) {
     return 'IMEI must be exactly 15 digits';
   }
-
-  // Check if all characters are digits
   if (!/^\d+$/.test(cleanIMEI)) {
     return 'IMEI must contain only numbers';
   }
-
-  // Check for invalid sequences
   if (/^0{15}$/.test(cleanIMEI)) {
     return 'Invalid IMEI: cannot be all zeros';
   }
-
   if (/^1{15}$/.test(cleanIMEI)) {
     return 'Invalid IMEI: cannot be all ones';
   }
 
-  // TAC validation (first 8 digits)
   const tac = cleanIMEI.substring(0, 8);
   if (!/^[0-9]{8}$/.test(tac)) {
     return 'Invalid Type Allocation Code (TAC)';
   }
 
-  // Luhn algorithm validation
   let sum = 0;
   let isEven = false;
-
   for (let i = cleanIMEI.length - 1; i >= 0; i--) {
     let digit = parseInt(cleanIMEI[i]);
     
@@ -129,6 +140,8 @@ app.get('/api/check-imei', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
+// Start the server
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

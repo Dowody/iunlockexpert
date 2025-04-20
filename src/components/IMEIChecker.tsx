@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Search, Smartphone, X, Check, AlertCircle, Shield, Info, Globe, Clock, Wifi, Loader2, Lock, Zap, Star } from 'lucide-react';
+import { 
+  Search, Smartphone, X, Check, AlertCircle, Shield, Info, Globe, Clock, 
+  Wifi, Loader2, Lock, Zap, Star, RefreshCw, Calendar, Cpu 
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface DeviceInfo {
@@ -18,7 +21,14 @@ interface DeviceInfo {
     deviceName?: string;
     image?: string;
     imei?: string;
+    imei2?: string;
+    serial?: string;
+    meid?: string;
+    eid?: string;
     estPurchaseDate?: number;
+    manufactureDate?: number;
+    unitAge?: string;
+    assembledIn?: string;
     simLock?: boolean;
     warrantyStatus?: string;
     repairCoverage?: string;
@@ -32,6 +42,19 @@ interface DeviceInfo {
     lostMode?: string;
     usaBlockStatus?: string;
     network?: string;
+    carrier?: string;
+    country?: string;
+    gsmaBlacklisted?: boolean;
+    blacklistRecords?: string;
+    mdmLock?: boolean;
+    activated?: boolean;
+    acEligible?: boolean;
+    validPurchaseDate?: boolean;
+    registered?: boolean;
+    replaced?: boolean;
+    replacement?: boolean;
+    loaner?: boolean;
+    nextActivationPolicyId?: string;
   };
 }
 
@@ -50,10 +73,9 @@ const services: Service[] = [
     price: "$0.06",
     description: "Essential device information and basic status check",
     features: [
-      "Model & Serial Number",
-      "Purchase Date",
-      "Basic Lock Status",
-      "Network Status"
+      "Basic Device Info",
+      "Carrier Status",
+      "Activation Details"
     ]
   },
   {
@@ -65,8 +87,7 @@ const services: Service[] = [
       "All Basic Check Features",
       "Warranty Status",
       "Repair History",
-      "Find My iPhone Status",
-      "Blacklist Status"
+      "Find My iPhone Status"
     ]
   },
   {
@@ -76,11 +97,9 @@ const services: Service[] = [
     description: "Complete device analysis including MDM status",
     features: [
       "All Advanced Check Features",
+      "Security Status",
       "MDM Lock Status",
-      "iCloud Status",
-      "Activation Status",
-      "Technical Specifications",
-      "Parts & Service History"
+      "Technical Specifications"
     ]
   }
 ];
@@ -195,8 +214,203 @@ export default function IMEIChecker() {
     }
   };
 
+
+  const renderDeviceInfo = () => {
+    if (!deviceInfo || deviceInfo.status !== 'successful') return null;
+
+    const info = deviceInfo.properties;
+
+    // Basic Service Containers
+    const basicInfo = (
+      <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="flex items-center space-x-2 mb-2">
+          <Smartphone className="w-5 h-5 text-blue-600" />
+          <span className="text-gray-600">Basic Device Info</span>
+        </div>
+        <div className="space-y-2">
+          <p><span className="text-gray-600">Model:</span> {info.modelDesc || 'Unknown'}</p>
+          <p><span className="text-gray-600">Serial:</span> {info.serial || 'Unknown'}</p>
+          <p><span className="text-gray-600">IMEI:</span> {info.imei || 'Unknown'}</p>
+        </div>
+      </div>
+    );
+
+    const carrierStatus = (
+      <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="flex items-center space-x-2 mb-2">
+          <Wifi className="w-5 h-5 text-blue-600" />
+          <span className="text-gray-600">Carrier Status</span>
+        </div>
+        <div className="space-y-2">
+          <p><span className="text-gray-600">Current Carrier:</span> {info.carrier || 'Unknown'}</p>
+          <p><span className="text-gray-600">Network:</span> {info.network || 'Unknown'}</p>
+          <p><span className="text-gray-600">SIM Lock:</span> {info.simLock ? "Locked" : "Unlocked"}</p>
+        </div>
+      </div>
+    );
+
+    const activationDetails = (
+      <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="flex items-center space-x-2 mb-2">
+          <Zap className="w-5 h-5 text-blue-600" />
+          <span className="text-gray-600">Activation Details</span>
+        </div>
+        <div className="space-y-2">
+          <p><span className="text-gray-600">Activation Status:</span> {info.activated ? "Yes" : "No"}</p>
+          <p><span className="text-gray-600">Region:</span> {info.country || 'Unknown'}</p>
+          <p><span className="text-gray-600">Registered:</span> {info.registered ? "Yes" : "No"}</p>
+        </div>
+      </div>
+    );
+
+    // Advanced Service Containers
+    const warrantyInfo = (
+      <div className="p-4 bg-blue-50 rounded-lg">
+        <div className="flex items-center space-x-2 mb-2">
+          <Shield className="w-5 h-5 text-blue-600" />
+          <span className="text-gray-600">Warranty Status</span>
+        </div>
+        <div className="space-y-2">
+          <p><span className="text-gray-600">Warranty Status:</span> {info.warrantyStatus || 'Unknown'}</p>
+          <p><span className="text-gray-600">Coverage:</span> {info.repairCoverage ? "Active" : "Expired"}</p>
+          <p><span className="text-gray-600">Support:</span> {info.technicalSupport ? "Available" : "Expired"}</p>
+        </div>
+      </div>
+    );
+
+    const serviceHistory = (
+      <div className="p-4 bg-blue-50 rounded-lg">
+        <div className="flex items-center space-x-2 mb-2">
+          <RefreshCw className="w-5 h-5 text-blue-600" />
+          <span className="text-gray-600">Service History</span>
+        </div>
+        <div className="space-y-2">
+          <p><span className="text-gray-600">Replacement Unit:</span> {info.replacement ? "Yes" : "No"}</p>
+          <p><span className="text-gray-600">Refurbished:</span> {info.refurbished ? "Yes" : "No"}</p>
+          <p><span className="text-gray-600">Parts Modified:</span> {info.replaced ? "Yes" : "No"}</p>
+        </div>
+      </div>
+    );
+
+    const findMyStatus = (
+      <div className="p-4 bg-blue-50 rounded-lg">
+        <div className="flex items-center space-x-2 mb-2">
+          <Globe className="w-5 h-5 text-blue-600" />
+          <span className="text-gray-600">Find My iPhone</span>
+        </div>
+        <div className="space-y-2">
+          <p><span className="text-gray-600">Status:</span> {info.fmiOn ? "Enabled" : "Disabled"}</p>
+          <p><span className="text-gray-600">Lost Mode:</span> {info.lostMode ? "Active" : "Inactive"}</p>
+        </div>
+      </div>
+    );
+
+    // Full Service Containers
+    const securityStatus = (
+      <div className="p-4 bg-purple-50 rounded-lg">
+        <div className="flex items-center space-x-2 mb-2">
+          <Shield className="w-5 h-5 text-blue-600" />
+          <span className="text-gray-600">Security Status</span>
+        </div>
+        <div className="space-y-2">
+          <p><span className="text-gray-600">Blacklist Status:</span> {info.usaBlockStatus || 'Unknown'}</p>
+          <p><span className="text-gray-600">GSMA Status:</span> {info.gsmaBlacklisted ? "Blacklisted" : "Clean"}</p>
+          <p><span className="text-gray-600">Records:</span> {info.blacklistRecords || "0"}</p>
+        </div>
+      </div>
+    );
+
+    const lockStatus = (
+      <div className="p-4 bg-purple-50 rounded-lg">
+        <div className="flex items-center space-x-2 mb-2">
+          <Lock className="w-5 h-5 text-blue-600" />
+          <span className="text-gray-600">Lock Status</span>
+        </div>
+        <div className="space-y-2">
+          <p><span className="text-gray-600">MDM Lock:</span> {info.mdmLock ? "Yes" : "No"}</p>
+          <p><span className="text-gray-600">iCloud Lock:</span> {info.fmiOn ? "Yes" : "No"}</p>
+          <p><span className="text-gray-600">Activation Lock:</span> {info.acEligible ? "Eligible" : "Not Eligible"}</p>
+        </div>
+      </div>
+    );
+
+    const technicalStatus = (
+      <div className="p-4 bg-purple-50 rounded-lg">
+        <div className="flex items-center space-x-2 mb-2">
+          <Cpu className="w-5 h-5 text-blue-600" />
+          <span className="text-gray-600">Technical Status</span>
+        </div>
+        <div className="space-y-2">
+          <p><span className="text-gray-600">Demo Unit:</span> {info.demoUnit ? "Yes" : "No"}</p>
+          <p><span className="text-gray-600">Loaner Device:</span> {info.loaner ? "Yes" : "No"}</p>
+          <p><span className="text-gray-600">Next Policy:</span> {info.nextActivationPolicyId || "N/A"}</p>
+        </div>
+      </div>
+    );
+
+    const statusBanner = (
+      <div className={`p-4 rounded-lg ${
+        info.usaBlockStatus === 'Clean' ? 'bg-green-50' : 'bg-red-50'
+      }`}>
+        <div className="flex items-center justify-center space-x-2">
+          {info.usaBlockStatus === 'Clean' ? (
+            <>
+              <Check className="w-6 h-6 text-green-600" />
+              <span className="font-semibold text-green-800">
+                Device is clean and ready to use
+              </span>
+            </>
+          ) : (
+            <>
+              <X className="w-6 h-6 text-red-600" />
+              <div className="text-red-800">
+                <p className="font-semibold">Device is blacklisted</p>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center space-x-3 mb-2">
+          <Smartphone className="w-8 h-8 text-blue-600" />
+          <h3 className="text-xl font-semibold">{info.deviceName || info.modelDesc}</h3>
+        </div>
+
+        {statusBanner}
+
+        {/* Basic Service - Level 1 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {basicInfo}
+          {carrierStatus}
+          {activationDetails}
+        </div>
+
+        {/* Advanced Service - Level 2 */}
+        {selectedService >= 2 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {warrantyInfo}
+            {serviceHistory}
+            {findMyStatus}
+          </div>
+        )}
+
+        {/* Full Service - Level 3 */}
+        {selectedService === 3 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {securityStatus}
+            {lockStatus}
+            {technicalStatus}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
-    <section className="bg-gradient-to-b from-blue-50 to-white py-12 md:py-16">
+    <section className="bg-gradient-to-b from-blue-50 to-white py-8 md:py-12">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center">
           <motion.div
@@ -210,13 +424,13 @@ export default function IMEIChecker() {
                 Official IMEI Device Checker
               </h2>
             </div>
-            <p className="text-gray-600 mb-8">
+            <p className="text-gray-600 mb-6">
               Verify device authenticity and check blacklist status through our official database
             </p>
           </motion.div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
               {services.map((service) => (
                 <motion.div
                   key={service.id}
@@ -233,8 +447,8 @@ export default function IMEIChecker() {
                     <h3 className="font-semibold text-lg">{service.title}</h3>
                     <span className="text-blue-600 font-bold">{service.price}</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4">{service.description}</p>
-                  <ul className="space-y-2">
+                  <p className="text-sm text-gray-600 mb-3">{service.description}</p>
+                  <ul className="space-y-1.5">
                     {service.features.map((feature, index) => (
                       <li key={index} className="flex items-center text-sm">
                         <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
@@ -275,7 +489,7 @@ export default function IMEIChecker() {
               </button>
             </div>
 
-            <div className="flex items-center justify-center space-x-2 text-sm text-gray-500 mb-4">
+            <div className="flex items-center justify-center space-x-2 text-sm text-gray-500 mb-3">
               <button
                 onClick={() => setShowHelp(!showHelp)}
                 className="flex items-center space-x-1 hover:text-blue-600 transition-colors duration-300"
@@ -291,7 +505,7 @@ export default function IMEIChecker() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="bg-blue-50 p-4 rounded-lg mb-4 text-left"
+                  className="bg-blue-50 p-4 rounded-lg mb-3 text-left"
                 >
                   <h4 className="font-semibold mb-2">How to find your IMEI:</h4>
                   <ul className="list-disc list-inside space-y-1 text-sm">
@@ -308,7 +522,7 @@ export default function IMEIChecker() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 text-red-500 flex items-center justify-center space-x-2"
+                className="mt-3 text-red-500 flex items-center justify-center space-x-2"
               >
                 <AlertCircle className="w-5 h-5" />
                 <span>{error}</span>
@@ -321,86 +535,9 @@ export default function IMEIChecker() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className="mt-8 space-y-6"
+                  className="mt-6"
                 >
-                  <div className="flex items-center justify-center space-x-3">
-                    <Smartphone className="w-8 h-8 text-blue-600" />
-                    <h3 className="text-xl font-semibold">{deviceInfo.properties.deviceName}</h3>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 text-left">
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <span className="text-gray-600">Model</span>
-                      <p className="font-semibold">{deviceInfo.properties.modelDesc}</p>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <span className="text-gray-600">Purchase Country</span>
-                      <p className="font-semibold">{deviceInfo.properties.purchaseCountry}</p>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <span className="text-gray-600">Device Type</span>
-                      <p className="font-semibold">{deviceInfo.properties.deviceName?.split(' ')[0]}</p>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <span className="text-gray-600">Purchase Date</span>
-                      <p className="font-semibold">
-                        {deviceInfo.properties.estPurchaseDate 
-                          ? new Date(deviceInfo.properties.estPurchaseDate * 1000).toLocaleDateString()
-                          : 'Unknown'
-                        }
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 text-left">
-                    <div className="p-4 bg-blue-50 rounded-lg">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Globe className="w-5 h-5 text-blue-600" />
-                        <span className="text-gray-600">Network Status</span>
-                      </div>
-                      <p className="font-semibold">{deviceInfo.properties.network}</p>
-                      <p className="text-sm text-gray-600">{deviceInfo.properties["apple/region"]}</p>
-                    </div>
-                    <div className="p-4 bg-blue-50 rounded-lg">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Clock className="w-5 h-5 text-blue-600" />
-                        <span className="text-gray-600">Warranty Status</span>
-                      </div>
-                      <p className="font-semibold">{deviceInfo.properties.warrantyStatus}</p>
-                    </div>
-                  </div>
-
-                  <div className={`p-4 rounded-lg ${
-                    deviceInfo.properties.usaBlockStatus === 'Clean' ? 'bg-green-50' : 'bg-red-50'
-                  }`}>
-                    <div className="flex items-center justify-center space-x-2">
-                      {deviceInfo.properties.usaBlockStatus === 'Clean' ? (
-                        <>
-                          <Check className="w-6 h-6 text-green-600" />
-                          <span className="font-semibold text-green-800">
-                            Device is clean and ready to use
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <X className="w-6 h-6 text-red-600" />
-                          <div className="text-red-800">
-                            <p className="font-semibold">Device is blacklisted</p>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <Wifi className="w-5 h-5 text-blue-600" />
-                      <span className="text-gray-600">SIM Lock Status</span>
-                    </div>
-                    <p className="font-semibold">
-                      {deviceInfo.properties.simLock ? 'Locked to Carrier' : 'Unlocked'}
-                    </p>
-                  </div>
+                  {renderDeviceInfo()}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -408,5 +545,6 @@ export default function IMEIChecker() {
         </div>
       </div>
     </section>
+    
   );
 }

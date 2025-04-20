@@ -5,7 +5,7 @@ import { Menu, X, Home, Clock, Wrench, HelpCircle } from 'lucide-react';
 
 const menuItems = [
   { name: 'Home', icon: Home, path: '/' },
-  { name: 'Order Status', icon: Clock, path: '/order-status' },
+  // { name: 'Order Status', icon: Clock, path: '/order-status' },
   { name: 'Services', icon: Wrench, path: '/services' },
   { name: 'Help', icon: HelpCircle, path: '/help' },
 ];
