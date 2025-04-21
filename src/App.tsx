@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import HomePage from './components/HomePage';
 import DeviceUnlock from './components/DeviceUnlock';
 import TermsAndConditions from './components/TermsAndConditions';
@@ -25,6 +25,9 @@ function App() {
     <>
       <ScrollToTop />
       <Routes>
+        <Route path="/" element={<Navigate to="/home" replace />} />
+
+
         <Route path="/home" element={<HomePage />} />
         <Route path="/unlock/:model" element={<DeviceUnlock />} />
         <Route path="/terms" element={<TermsAndConditions />} />
