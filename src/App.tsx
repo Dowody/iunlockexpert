@@ -25,10 +25,7 @@ function App() {
     <>
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<Navigate to="/home" replace />} />
-
-
-        <Route path="/home" element={<HomePage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/unlock/:model" element={<DeviceUnlock />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/services" element={<Services />} />

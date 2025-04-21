@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Home, Clock, Wrench, HelpCircle } from 'lucide-react';
 
 const menuItems = [
-  { name: 'Home', icon: Home, path: '/home' },
+  { name: 'Home', icon: Home, path: '/' },
   // { name: 'Order Status', icon: Clock, path: '/order-status' },
   { name: 'Services', icon: Wrench, path: '/services' },
   { name: 'Help', icon: HelpCircle, path: '/help' },
@@ -22,7 +22,7 @@ export default function Navigation() {
     >
       <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
         <div className="flex justify-between items-center">
-          <Link to="/home">
+          <Link to="/">
             <motion.div 
               className="flex items-center space-x-2"
               whileHover={{ scale: 1.05 }}
