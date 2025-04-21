@@ -45,11 +45,16 @@ export default function Footer() {
                   Services
                 </Link>
               </li>
-              {/* <li>
-                <Link to="/order-status" className="text-gray-400 hover:text-white transition-colors duration-300">
-                  Track Order
+              <li>
+                <Link to="/device-catalog" className="text-gray-400 hover:text-white transition-colors duration-300">
+                  Device Catalog
                 </Link>
-              </li> */}
+              </li>
+              <li>
+                <Link to="/imei-check" className="text-gray-400 hover:text-white transition-colors duration-300">
+                  IMEI Checker
+                </Link>
+              </li>
               <li>
                 <Link to="/help" className="text-gray-400 hover:text-white transition-colors duration-300">
                   Help Center

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ChevronRight, Shield, Check, Clock, Phone, Star, AlertCircle, Zap, Lock, Timer } from 'lucide-react';
+import { ChevronRight, Shield, Check, Clock, Phone, Star, AlertCircle, Zap, Lock, Timer, GlobeLock, Cloud, ShieldOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateReceipt } from '../utils/generateReceipt';
 import { connectTrustWallet, sendTransaction } from '../utils/trustWallet';
@@ -13,6 +13,7 @@ const carriers = [
 interface UnlockService {
   id: string;
   name: string;
+  icon: React.ElementType;
   originalPrice: number;
   discountedPrice: number;
   averageTime: string;
@@ -20,58 +21,69 @@ interface UnlockService {
   successRate: string;
   description: string;
   features: string[];
-}
+  type: string;
 
+}
 const services: UnlockService[] = [
   {
-    id: "premium",
-    name: "Premium Unlock",
-    originalPrice: 99.95,
-    discountedPrice: 79.95,
-    averageTime: "1-2 hours",
+    id: "mdm",
+    name: "MDM Bypass",
+    icon: ShieldOff,
+    originalPrice: 59.99,
+    discountedPrice: 39.99,
+    averageTime: "24 hours",
     deliveryTime: "24 hours guaranteed",
     successRate: "99.9%",
-    description: "Our premium unlocking service provides the fastest turnaround time with guaranteed results. Perfect for users who need their device unlocked quickly and reliably.",
+    description: "Remove Mobile Device Management restrictions",
     features: [
-      "Priority Processing",
-      "24/7 Support",
-      "Money-back Guarantee",
-      "Permanent Unlock"
-    ]
+      "Permanent MDM removal",
+      "Works for all iOS devices",
+      "No jailbreak required",
+      "Quick 24-hour processing"
+    ],
+    type: "mdm-bypass"
   },
   {
-    id: "standard",
-    name: "Standard Unlock",
-    originalPrice: 69.95,
-    discountedPrice: 49.95,
+    id: "icloud",
+    name: "iCloud Unlock",
+    icon: Cloud,
+    originalPrice: 69.99,
+    discountedPrice: 49.99,
     averageTime: "24-48 hours",
     deliveryTime: "3 business days",
-    successRate: "99%",
-    description: "The most popular option for reliable carrier unlocking. Balanced between speed and cost-effectiveness.",
+    successRate: "99.9%",
+    description: "Unlock iCloud-locked Apple devices",
     features: [
-      "Standard Processing",
-      "Email Support",
-      "Money-back Guarantee",
-      "Permanent Unlock"
-    ]
+      "Official iCloud unlock method",
+      "Supports all iPhone models",
+      "Worldwide service",
+      "100% success guarantee"
+    ],
+    type: "icloud-unlock"
   },
   {
-    id: "basic",
-    name: "Basic Unlock",
+    id: "sim",
+    name: "SIM Unlock",
+    icon: GlobeLock,
     originalPrice: 49.95,
-    discountedPrice: 29.95,
+    discountedPrice: 29.99,
     averageTime: "3-5 days",
     deliveryTime: "7 business days",
-    successRate: "98%",
-    description: "Economic solution for users who don't mind waiting longer for their unlock code. Same reliable service at a lower price.",
+    successRate: "99.9%",
+    description: "Carrier unlock for mobile devices",
     features: [
-      "Regular Processing",
-      "Email Support",
-      "Money-back Guarantee",
-      "Permanent Unlock"
-    ]
+      "Permanent carrier unlock",
+      "Compatible with all carriers",
+      "Global network support",
+      "Fast and secure process"
+    ],
+    type: "sim-unlock"
   }
 ];
+// Utility function for precise rounding
+const roundToTwoDecimals = (num: number): number => {
+  return Math.round(num * 100) / 100;
+};
 
 const cryptoPayments = [
   {
@@ -409,7 +421,12 @@ export default function DeviceUnlock() {
                   </div>
                   <div className="flex justify-between text-green-600">
                     <span>Discount</span>
-                    <span>-€{(selectedService?.originalPrice || 0) - (selectedService?.discountedPrice || 0)}</span>
+                    <span>
+                      -€{roundToTwoDecimals(
+                      (selectedService?.originalPrice || 0) - 
+                      (selectedService?.discountedPrice || 0)
+                      ).toFixed(2)}
+                    </span>
                   </div>
                   {includeBlacklistCheck && (
                     <div className="flex justify-between">
@@ -419,7 +436,11 @@ export default function DeviceUnlock() {
                   )}
                   <div className="flex justify-between text-xl font-bold mt-2">
                     <span>Total</span>
-                    <span>€{((selectedService?.discountedPrice || 0) + (includeBlacklistCheck ? 2.95 : 0)).toFixed(2)}</span>
+                    <span>€{roundToTwoDecimals(
+                      (selectedService?.discountedPrice || 0) + 
+                      (includeBlacklistCheck ? 2.95 : 0)
+                      ).toFixed(2)}
+                    </span>
                   </div>
                 </div>
               </div>

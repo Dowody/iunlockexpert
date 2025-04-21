@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Shield, CheckCircle, Award, Clock, Globe, Users, 
-  Phone, MessageSquare, Smartphone, Tablet, Laptop
+  Phone, MessageSquare, Smartphone, Tablet, Laptop,
+  Star, Lock,
+  ChevronRight,
+  HelpCircle,
+  Info
 } from 'lucide-react';
 import DeviceCard from './DeviceCard';
 import SearchBar from './SearchBar';
@@ -12,6 +16,14 @@ import IMEIChecker from './IMEIChecker';
 import Footer from './Footer';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/autoplay';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination } from 'swiper/modules';
+
+
 
 const appleDevices = {
   iphone: [
@@ -39,10 +51,16 @@ const appleDevices = {
 { model: "MacBook Air M1 (2020)", price: "$49.99", image: "https://5.imimg.com/data5/SELLER/Default/2024/4/414074292/OQ/RG/UD/35721490/apple-macbook-air-500x500.png" },
   ],
   ipad: [
-    { model: "iPad Pro 12.9-inch (6th generation)", price: "$34.99", image: "https://images.unsplash.com/photo-1585790050230-5dd28404ccb9" },
-    { model: "iPad Pro 11-inch (4th generation)", price: "$34.99", image: "https://images.unsplash.com/photo-1585790050230-5dd28404ccb9" },
-    { model: "iPad Air (5th generation)", price: "$29.99", image: "https://images.unsplash.com/photo-1585790050230-5dd28404ccb9" },
-    { model: "iPad (10th generation)", price: "$24.99", image: "https://images.unsplash.com/photo-1585790050230-5dd28404ccb9" }
+    { model: "iPad Pro 13-inch (1st gen, 2024)", price: "$59.99", image: "https://www.imagineonline.store/cdn/shop/files/iPad_Pro_13_M4_Cellular_Silver_PDP_Image_Position_1b__en-IN_dd2e2a82-05c9-4fc0-9714-0611d65872d3.jpg?v=1716466657&width=823" },
+{ model: "iPad Pro 11-inch (5th gen, 2024)", price: "$54.99", image: "https://www.machines.com.my/cdn/shop/products/iPad_Pro_Wi-Fi_11_in_4th_Gen_Silver_PDP_Image_Position-1b__SG.jpg?v=1705419289" },
+{ model: "iPad Pro 12.9-inch (6th gen, 2022)", price: "$54.99", image: "https://alephksa.com/cdn/shop/files/iPad_Pro_12_9_inch_Wi-Fi_Space_Gray_PDP_Image_Position-1b_EN_2a446aae-b0f2-477f-95a2-6e2c27c1bbe9.jpg?v=1695930274&width=1445" },
+{ model: "iPad Pro 11-inch (4th gen, 2022)", price: "$49.99", image: "https://www.machines.com.my/cdn/shop/products/iPad_Pro_Wi-Fi_11_in_4th_Gen_Silver_PDP_Image_Position-1b__SG_b73779cf-0c6e-4008-8023-92d7d0f26ce4_450x.jpg?v=1705418542" },
+{ model: "iPad Pro 9.7-inch (2016)", price: "$34.99", image: "https://d2e6ccujb3mkqf.cloudfront.net/50f4fbbd-a9ca-4de1-8b87-6f4f861745c5-1_add7ec61-fc96-488f-bd61-c55287aab95e.jpg" },
+{ model: "iPad Pro 12.9-inch (1st gen, 2015)", price: "$39.99", image: "https://istorepreowned.co.za/cdn/shop/products/iPad_Pro_12.9-inch_2015_1stGen-Space_Grey_c665a954-f7e7-424f-b616-1a037a401813.png?v=1710873602" },
+
+// iPad Air
+{ model: "iPad Air (6th gen, 2024)", price: "$44.99", image: "https://www.costco.co.uk/medias/sys_master/images/hf0/hd5/238984826191902.jpg" },
+{ model: "iPad Air (5th gen, 2022)", price: "$39.99", image: "https://images.shopkees.com/uploads/cdn/images/1000/6784996745_1646891783.jpg" },
   ]
 };
 
@@ -89,6 +107,51 @@ const benefits = [
   }
 ];
 
+
+
+const trustpilotReviews = [
+  {
+    name: "Sarah Mitchell",
+    profilePic: "https://randomuser.me/api/portraits/women/32.jpg",
+    rating: 5,
+    text: "Incredible service! Unlocked my iPhone within 24 hours. The process was smooth and professional. Highly recommended!",
+    date: "2 weeks ago",
+    platform: "Trustpilot"
+  },
+  {
+    name: "John Davidson",
+    profilePic: "https://randomuser.me/api/portraits/men/45.jpg",
+    rating: 5,
+    text: "Saved me from buying a new phone. The unlock service was fast, reliable, and exactly what I needed. Great value for money!",
+    date: "1 month ago",
+    platform: "Google Reviews"
+  },
+  {
+    name: "Emily Rodriguez",
+    profilePic: "https://randomuser.me/api/portraits/women/67.jpg",
+    rating: 4,
+    text: "Easy process with good communication. It took slightly longer than I expected, but the end result was exactly what I wanted.",
+    date: "3 weeks ago",
+    platform: "Trustpilot"
+  },
+  {
+    name: "Michael Thompson",
+    profilePic: "https://randomuser.me/api/portraits/men/22.jpg",
+    rating: 5,
+    text: "Absolutely fantastic service! Unlocked my MacBook without any hassle. Customer support was helpful and responsive.",
+    date: "2 months ago",
+    platform: "Google Reviews"
+  },
+  {
+    name: "Lisa Chen",
+    profilePic: "https://randomuser.me/api/portraits/women/55.jpg",
+    rating: 5,
+    text: "Couldn't be happier with the unlock service. Quick, efficient, and exactly as promised. Will definitely recommend to friends!",
+    date: "4 weeks ago",
+    platform: "Trustpilot"
+  }
+];
+
 const HomePage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("iphone");
@@ -112,8 +175,68 @@ const HomePage: React.FC = () => {
       <Navigation />
       <HeaderSlider />
       
-      <IMEIChecker />
-
+      <div className="bg-gradient-to-b from-blue-50 to-white py-12" >
+        <IMEIChecker />
+      </div>
+      
+      <div className="container mx-auto px-4 py-8 mt-7"  id="devices-section">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-blue-50 rounded-xl p-6 pt-10 pb-10 shadow-sm"
+        >
+          <div className="flex items-center space-x-4 mb-4">
+            <HelpCircle className="w-8 h-8 text-blue-600" />
+            <h2 className="text-2xl font-semibold text-blue-900">
+              How to Unlock Your Device
+            </h2>
+          </div>
+          
+            <div className="grid md:grid-cols-3 gap-4">
+              {[
+                {
+                  icon: Info,
+                  title: "1. Choose Device",
+                  description: "Select your specific Apple device from the catalog below."
+                },
+                {
+                  icon: Lock,
+                  title: "2. Select Unlock Service",
+                  description: "Pick the appropriate unlocking service for your needs."
+                },
+                {
+                  icon: Shield,
+                  title: "3. Complete Unlock",
+                  description: "Follow the guided process to unlock your device securely."
+                }
+              ].map((step, index) => (
+                <motion.div
+                  key={step.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    delay: index * 0.2,
+                    duration: 0.3
+                  }}
+                  className="bg-white rounded-lg p-4 text-center shadow-md"
+                >
+                  <div className="flex justify-center mb-3">
+                    <div className="bg-blue-100 rounded-full p-3">
+                      <step.icon className="w-6 h-6 text-blue-600" />
+                    </div>
+                  </div>
+                  <h3 className="font-semibold text-blue-900 mb-2">
+                    {step.title}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {step.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-center space-x-4 mb-6">
@@ -180,6 +303,7 @@ const HomePage: React.FC = () => {
         </div>
           </div>
      
+  
 
       <div className="flex justify-center mt-8 mb-20">
           <motion.button
@@ -193,6 +317,120 @@ const HomePage: React.FC = () => {
           </motion.button>
         </div>
 
+        
+      {/* Trustpilot Reviews Section */}
+      <section className="bg-white py-12 md:py-16 relative">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <div className="flex flex-col items-center justify-center mb-6">
+              <div className="flex space-x-4 mb-4">
+                <img 
+                  src="/iunlockexpert/trustpilot-logo.png" 
+                  alt="TrustPilot Logo" 
+                  className="h-20 mb-5"
+                />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+                Verified Customer Reviews
+              </h2>
+              
+            </div>
+          </motion.div>
+
+          <Swiper
+            modules={[Autoplay, Pagination]}
+            spaceBetween={30}
+            slidesPerView={1}
+            centeredSlides={true}
+            loop={true}
+            autoplay={{
+              delay: 3000,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: true
+            }}
+            pagination={{ 
+              clickable: true,
+              bulletClass: 'swiper-pagination-bullet',
+              bulletActiveClass: 'swiper-pagination-bullet-active'
+            }}
+            breakpoints={{
+              640: {
+                slidesPerView: 2,
+                spaceBetween: 20,
+              },
+              1024: {
+                slidesPerView: 3,
+                spaceBetween: 30,
+              },
+            }}
+            className="reviews-swiper"
+          >
+            {trustpilotReviews.map((review, index) => (
+              <SwiperSlide key={index}>
+                <div className="bg-gray-50 rounded-xl p-6 h-full flex flex-col justify-between shadow-md hover:shadow-lg transition-shadow duration-300">
+                  <div>
+                    <div className="flex items-center mb-4">
+                      <div className="flex space-x-1 text-green-500 mr-4">
+                        {[...Array(review.rating)].map((_, i) => (
+                          <Star key={i} className="w-5 h-5 fill-current" />
+                        ))}
+                        {[...Array(5 - review.rating)].map((_, i) => (
+                          <Star key={i} className="w-5 h-5 text-gray-300" />
+                        ))}
+                      </div>
+                      <span className="text-gray-500 text-sm">{review.platform}</span>
+                    </div>
+                    <p className="text-gray-700 mb-4 italic">"{review.text}"</p>
+                  </div>
+                  <div className="flex items-center mt-4">
+                    <img 
+                      src={review.profilePic} 
+                      alt={review.name} 
+                      className="w-12 h-12 rounded-full mr-4 object-cover"
+                    />
+                    <div>
+                      <div className="flex items-center">
+                        <span className="font-medium text-gray-800 mr-2">{review.name}</span>
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      </div>
+                      <div className="text-sm text-gray-500">Verified Customer</div>
+                    </div>
+                  </div>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+           <div className="flex flex-col items-center justify-center mt-10 mb-6">
+    
+              <div className="flex flex-col items-center justify-center space-y-2">
+              <span className="text-gray-600 font-semibold">4.8 out of 5</span>
+
+                <img 
+                  src="/iunlockexpert/stars-5.svg" 
+                  alt="TrustPilot Logo" 
+                  className="h-7"
+                />
+              </div>
+
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+
+      
       <section className="bg-gray-100 py-12 md:py-24">
         <div className="container mx-auto px-3 md:px-4">
           <motion.div

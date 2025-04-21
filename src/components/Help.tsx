@@ -155,7 +155,7 @@ export default function Help() {
               <h3 className="text-lg font-semibold mb-2">WhatsApp Support</h3>
               <p className="text-gray-600 mb-4">Get instant help via WhatsApp</p>
               <a 
-                href="https://wa.me/18007865274" 
+                href="https://wa.me/15793860596" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors duration-300"

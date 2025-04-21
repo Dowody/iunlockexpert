@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Home, Clock, Wrench, HelpCircle } from 'lucide-react';
+import { Menu, X, Home, Clock, Wrench, HelpCircle, List, Smartphone, TabletSmartphone, ScanSearch } from 'lucide-react';
 
 const menuItems = [
   { name: 'Home', icon: Home, path: '/' },
-  // { name: 'Order Status', icon: Clock, path: '/order-status' },
+  { name: 'Device Catalog', icon: TabletSmartphone, path: '/device-catalog' },
+  { name: 'IMEI Checker', icon: ScanSearch, path: '/imei-check' },
   { name: 'Services', icon: Wrench, path: '/services' },
   { name: 'Help', icon: HelpCircle, path: '/help' },
 ];

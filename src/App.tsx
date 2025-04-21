@@ -8,6 +8,10 @@ import DeviceCatalog from './components/DeviceCatalog';
 import Help from './components/Help';
 import Receipt from './components/Receipt';
 import Services from './components/Services';
+import IcloudUnlockPage from './components/icloudUnlockPage';
+import MdmBypassPage from './components/MdmBypassPage';
+import SimUnlockPage from './components/SimUnlockPage';
+import IMEICheckPage from './components/IMEICheckPage';
 
 
 function ScrollToTop() {
@@ -33,6 +37,10 @@ function App() {
         <Route path="/device-catalog" element={<DeviceCatalog />} />
         <Route path="/help" element={<Help />} />
         <Route path="/receipt" element={<Receipt />} />
+        <Route path="/services/icloud-unlock" element={<IcloudUnlockPage />} />
+        <Route path="/services/mdm-bypass" element={<MdmBypassPage />} />
+        <Route path="/services/sim-unlock" element={<SimUnlockPage />} />
+        <Route path="/imei-check" element={<IMEICheckPage />} />
       </Routes>
 
     </>

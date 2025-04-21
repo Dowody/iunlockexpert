@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useNavigate, useParams } from 'react-router-dom';
 import { 
   Smartphone, Tablet, Laptop, 
-  Lock, Shield, Globe 
+  Lock, Shield, Globe, 
+  CheckCircle,
+  HelpCircle,
+  X,
+  Info
 } from 'lucide-react';
 import Navigation from './Navigation';
 import SearchBar from './SearchBar';
 import Footer from './Footer';
+
 
 
 export const appleDevices = {
@@ -84,19 +89,130 @@ export const appleDevices = {
   ]
 };
 
+
+const tutorialSteps = {
+  mdm: [
+    { 
+      title: "Check Device Compatibility", 
+      description: "Ensure your device is eligible for MDM bypass",
+      icon: Info
+    },
+    { 
+      title: "Select Your Device", 
+      description: "Choose the specific model you want to unlock",
+      icon: Smartphone
+    },
+    { 
+      title: "Choose Unlock Service", 
+      description: "Select the MDM bypass service that fits your needs",
+      icon: Lock
+    },
+    { 
+      title: "Complete Payment", 
+      description: "Securely pay using cryptocurrency or other methods",
+      icon: Shield
+    },
+    { 
+      title: "Receive Instructions", 
+      description: "Get detailed unlock instructions via email",
+      icon: CheckCircle
+    }
+  ],
+  icloud: [
+    { 
+      title: "Verify Device Status", 
+      description: "Confirm your device is iCloud locked",
+      icon: Info
+    },
+    { 
+      title: "Select Device Model", 
+      description: "Pick the exact iPhone or iPad model",
+      icon: Tablet
+    },
+    { 
+      title: "Select Unlock Package", 
+      description: "Choose the iCloud unlock service level",
+      icon: Lock
+    },
+    { 
+      title: "Make Secure Payment", 
+      description: "Pay using cryptocurrency or preferred method",
+      icon: Shield
+    },
+    { 
+      title: "Get Unlock Code", 
+      description: "Receive unlock instructions and code via email",
+      icon: CheckCircle
+    }
+  ],
+  sim: [
+    { 
+      title: "Check Carrier Lock", 
+      description: "Verify your device is carrier-locked",
+      icon: Info
+    },
+    { 
+      title: "Choose Device", 
+      description: "Select your specific device model",
+      icon: Smartphone
+    },
+    { 
+      title: "Select Unlock Service", 
+      description: "Pick the right SIM unlock package",
+      icon: Lock
+    },
+    { 
+      title: "Complete Transaction", 
+      description: "Pay securely using cryptocurrency",
+      icon: Shield
+    },
+    { 
+      title: "Receive Unlock Details", 
+      description: "Get unlock instructions sent to your email",
+      icon: CheckCircle
+    }
+  ]
+};
+
 const DeviceCatalog: React.FC = () => {
+  const { type } = useParams<{ type: string }>();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("iphone");
+  const [selectedCategory, setSelectedCategory] = useState<keyof typeof appleDevices>("iphone");
+  const [showTutorial, setShowTutorial] = useState(true);
 
-  const filteredDevices = appleDevices[selectedCategory as keyof typeof appleDevices]
+  const filteredDevices = appleDevices[selectedCategory]
     .filter(device => device.model.toLowerCase().includes(searchTerm.toLowerCase()));
 
+  const getDeviceIcon = (serviceType: string | undefined) => {
+    switch(serviceType) {
+      case 'mdm': return Smartphone;
+      case 'icloud': return Tablet;
+      case 'sim': return Laptop;
+      default: return Smartphone;
+    }
+  };
+
+  const DeviceIcon = getDeviceIcon(type);
+
   const handleDeviceUnlock = (model: string) => {
-    navigate(`/unlock/${encodeURIComponent(model)}`);
+    navigate(`/unlock/${encodeURIComponent(model)}`, { 
+      state: { 
+        serviceType: type,
+        category: selectedCategory 
+      } 
+    });
+  };
+
+  const formattedCategory: Record<string, string> = {
+    iphone: 'iPhone',
+    ipad: 'iPad',
+    macbook: 'MacBook',
   };
 
   return (
+
+    
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -113,21 +229,137 @@ const DeviceCatalog: React.FC = () => {
       >
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold mb-4">
-            Device Catalog
+            {type ? `${type.toUpperCase()} Unlock` : 'Device Catalog'}
           </h1>
           <p className="text-xl text-blue-100">
-            Browse and unlock your Apple devices
+            {type 
+              ? `Select your specific ${type} model for unlocking`
+              : 'Browse and unlock your Apple devices'}
           </p>
         </div>
       </motion.div>
 
       <div className="container mx-auto px-4 py-8">
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+    className="bg-blue-50 rounded-xl p-6 pb-10 shadow-sm"
+  >
+    <div className="flex items-center space-x-4 mb-4">
+      <HelpCircle className="w-8 h-8 text-blue-600" />
+      <h2 className="text-center text-2xl font-semibold text-blue-900">
+        How to Unlock Your Device
+      </h2>
+    </div>
+    
+      <div className="grid md:grid-cols-3 gap-4">
+        {[
+          {
+            icon: Info,
+            title: "1. Choose Device",
+            description: "Select your specific Apple device from the catalog below."
+          },
+          {
+            icon: Lock,
+            title: "2. Select Unlock Service",
+            description: "Pick the appropriate unlocking service for your needs."
+          },
+          {
+            icon: Shield,
+            title: "3. Complete Unlock",
+            description: "Follow the guided process to unlock your device securely."
+          }
+        ].map((step, index) => (
+          <motion.div
+            key={step.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              delay: index * 0.2,
+              duration: 0.3
+            }}
+            className="bg-white rounded-lg p-4 text-center shadow-md"
+          >
+            <div className="flex justify-center mb-3">
+              <div className="bg-blue-100 rounded-full p-3">
+                <step.icon className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+            <h3 className="font-semibold text-blue-900 mb-2">
+              {step.title}
+            </h3>
+            <p className="text-sm text-gray-600">
+              {step.description}
+            </p>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  </div>
+
+
+      {/* Comprehensive Tutorial Section */}
+      <AnimatePresence>
+        {type && showTutorial && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="container mx-auto px-4 py-6"
+          >
+            <div className="bg-blue-50 rounded-xl shadow-lg p-6 relative">
+              <button 
+                onClick={() => setShowTutorial(false)}
+                className="absolute top-4 right-4 text-blue-600 hover:text-blue-800"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              
+              <div className="flex items-center space-x-4 mb-6">
+                <HelpCircle className="w-10 h-10 text-blue-600" />
+                <h2 className="text-2xl font-bold text-blue-900 capitalize">
+                  {type} Unlock Process
+                </h2>
+              </div>
+
+              <div className="grid md:grid-cols-5 gap-4">
+                {tutorialSteps[type as keyof typeof tutorialSteps].map((step, index) => {
+                  const StepIcon = step.icon;
+                  return (
+                    <motion.div
+                      key={step.title}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ 
+                        delay: index * 0.1,
+                        duration: 0.3
+                      }}
+                      className="bg-white rounded-lg p-4 text-center shadow-md hover:shadow-lg transition-all"
+                    >
+                      <div className="flex justify-center mb-3">
+                        <div className="bg-blue-100 rounded-full p-3">
+                          <StepIcon className="w-6 h-6 text-blue-600" />
+                        </div>
+                      </div>
+                      <h3 className="font-semibold text-blue-900 mb-2">
+                        Step {index + 1}: {step.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        {step.description}
+                      </p>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="container mx-auto px-4 py-8">
         <div className="flex justify-center space-x-4 mb-6">
-          {[
-            { category: "iphone", icon: Smartphone, label: "iPhones" },
-            { category: "ipad", icon: Tablet, label: "iPads" },
-            { category: "macbook", icon: Laptop, label: "MacBooks" }
-          ].map(({ category, icon: Icon, label }) => (
+          {(Object.keys(appleDevices) as Array<keyof typeof appleDevices>).map((category) => (
             <motion.button
               key={category}
               whileHover={{ scale: 1.05 }}
@@ -139,9 +371,11 @@ const DeviceCatalog: React.FC = () => {
                   : "bg-gray-200 text-gray-700 hover:bg-gray-300"
               }`}
             >
-              <Icon className="w-4 h-4 md:w-5 md:h-5" />
-              <span>{label}</span>
-            </motion.button>
+              {category === 'iphone' && <Smartphone className="w-4 h-4 md:w-5 md:h-5" />}
+              {category === 'ipad' && <Tablet className="w-4 h-4 md:w-5 md:h-5" />}
+              {category === 'macbook' && <Laptop className="w-4 h-4 md:w-5 md:h-5" />}
+              <span>{formattedCategory[category]}s</span>
+                          </motion.button>
           ))}
         </div>
 
@@ -149,13 +383,12 @@ const DeviceCatalog: React.FC = () => {
           <SearchBar value={searchTerm} onChange={setSearchTerm} />
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredDevices.map((device, index) => (
             <motion.div
               key={device.model}
               initial={{ opacity: 1, y: 0 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ 
                 delay: index * 0.1,
                 duration: 0.5
@@ -187,8 +420,8 @@ const DeviceCatalog: React.FC = () => {
 
         {filteredDevices.length === 0 && (
           <motion.div 
-            initial={{ opacity: 0, y: 0 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             className="text-center py-12 bg-white rounded-lg shadow-md"
           >
             <p className="text-gray-600 mb-4">No devices found matching your search.</p>
@@ -243,3 +476,4 @@ const DeviceCatalog: React.FC = () => {
 };
 
 export default DeviceCatalog;
+

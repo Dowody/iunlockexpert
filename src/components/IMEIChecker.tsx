@@ -175,6 +175,8 @@ export default function IMEIChecker() {
     return formatted.length > 0 ? formatted : imei;
   };
 
+
+
   const checkIMEI = async () => {
     const cleanIMEI = imei.replace(/[^0-9]/g, '');
     const validationError = validateIMEI(cleanIMEI);
@@ -410,7 +412,7 @@ export default function IMEIChecker() {
   };
 
   return (
-    <section className="bg-gradient-to-b from-blue-50 to-white py-8 md:py-12">
+    <section className="py-8 md:py-12">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center">
           <motion.div
