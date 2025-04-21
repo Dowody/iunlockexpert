@@ -39,16 +39,10 @@ const appleDevices = {
 { model: "MacBook Air M1 (2020)", price: "$49.99", image: "https://5.imimg.com/data5/SELLER/Default/2024/4/414074292/OQ/RG/UD/35721490/apple-macbook-air-500x500.png" },
   ],
   ipad: [
-    { model: "iPad Pro 13-inch (1st gen, 2024)", price: "$59.99", image: "https://www.imagineonline.store/cdn/shop/files/iPad_Pro_13_M4_Cellular_Silver_PDP_Image_Position_1b__en-IN_dd2e2a82-05c9-4fc0-9714-0611d65872d3.jpg?v=1716466657&width=823" },
-{ model: "iPad Pro 11-inch (5th gen, 2024)", price: "$54.99", image: "https://www.machines.com.my/cdn/shop/products/iPad_Pro_Wi-Fi_11_in_4th_Gen_Silver_PDP_Image_Position-1b__SG.jpg?v=1705419289" },
-{ model: "iPad Pro 12.9-inch (6th gen, 2022)", price: "$54.99", image: "https://alephksa.com/cdn/shop/files/iPad_Pro_12_9_inch_Wi-Fi_Space_Gray_PDP_Image_Position-1b_EN_2a446aae-b0f2-477f-95a2-6e2c27c1bbe9.jpg?v=1695930274&width=1445" },
-{ model: "iPad Pro 11-inch (4th gen, 2022)", price: "$49.99", image: "https://www.machines.com.my/cdn/shop/products/iPad_Pro_Wi-Fi_11_in_4th_Gen_Silver_PDP_Image_Position-1b__SG_b73779cf-0c6e-4008-8023-92d7d0f26ce4_450x.jpg?v=1705418542" },
-{ model: "iPad Pro 9.7-inch (2016)", price: "$34.99", image: "https://d2e6ccujb3mkqf.cloudfront.net/50f4fbbd-a9ca-4de1-8b87-6f4f861745c5-1_add7ec61-fc96-488f-bd61-c55287aab95e.jpg" },
-{ model: "iPad Pro 12.9-inch (1st gen, 2015)", price: "$39.99", image: "https://istorepreowned.co.za/cdn/shop/products/iPad_Pro_12.9-inch_2015_1stGen-Space_Grey_c665a954-f7e7-424f-b616-1a037a401813.png?v=1710873602" },
-
-// iPad Air
-{ model: "iPad Air (6th gen, 2024)", price: "$44.99", image: "https://www.costco.co.uk/medias/sys_master/images/hf0/hd5/238984826191902.jpg" },
-{ model: "iPad Air (5th gen, 2022)", price: "$39.99", image: "https://images.shopkees.com/uploads/cdn/images/1000/6784996745_1646891783.jpg" },
+    { model: "iPad Pro 12.9-inch (6th generation)", price: "$34.99", image: "https://images.unsplash.com/photo-1585790050230-5dd28404ccb9" },
+    { model: "iPad Pro 11-inch (4th generation)", price: "$34.99", image: "https://images.unsplash.com/photo-1585790050230-5dd28404ccb9" },
+    { model: "iPad Air (5th generation)", price: "$29.99", image: "https://images.unsplash.com/photo-1585790050230-5dd28404ccb9" },
+    { model: "iPad (10th generation)", price: "$24.99", image: "https://images.unsplash.com/photo-1585790050230-5dd28404ccb9" }
   ]
 };
 
