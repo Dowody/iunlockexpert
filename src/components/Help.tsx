@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageCircle, Phone, Mail, HelpCircle, ChevronDown,
-  Search, Clock, Shield, AlertCircle, CheckCircle, XCircle
+  Search, Clock, Shield, AlertCircle, CheckCircle, XCircle, Zap, MessageSquare
 } from 'lucide-react';
 import Navigation from './Navigation';
 import Footer from './Footer';
@@ -151,27 +151,37 @@ export default function Help() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="bg-white p-6 rounded-lg shadow-md text-center"
             >
-              <MessageCircle className="w-8 h-8 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Live Chat</h3>
-              <p className="text-gray-600 mb-4">Get instant help from our experts</p>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300">
+              <MessageSquare className="w-8 h-8 text-green-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">WhatsApp Support</h3>
+              <p className="text-gray-600 mb-4">Get instant help via WhatsApp</p>
+              <a 
+                href="https://wa.me/18007865274" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors duration-300"
+              >
                 Start Chat
-              </button>
+              </a>
             </motion.div>
 
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
               className="bg-white p-6 rounded-lg shadow-md text-center"
             >
-              <Phone className="w-8 h-8 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Phone Support</h3>
-              <p className="text-gray-600 mb-4">Call us at 1-800-UNLOCK-PRO</p>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300">
-                Call Now
-              </button>
-            </motion.div>
+              <Zap className="w-8 h-8 text-blue-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">WhatsApp Support</h3>
+              <p className="text-gray-600 mb-4">Quick support via WhatsApp</p>
+              <a 
+                href="https://wa.me/18007865274" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300"
+              >
+                Connect Now
+              </a>
+            </motion.div> */}
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -182,9 +192,12 @@ export default function Help() {
               <Mail className="w-8 h-8 text-blue-600 mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">Email Support</h3>
               <p className="text-gray-600 mb-4">Get help via email</p>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300">
+              <a 
+                href="mailto:support@iunlockexpert.com" 
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300"
+              >
                 Send Email
-              </button>
+              </a>
             </motion.div>
           </div>
         </div>

@@ -501,9 +501,9 @@ export default function DeviceUnlock() {
       <nav className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
-            <Link to="/" className="text-gray-600 hover:text-blue-600">Home</Link>
+            <Link to="/home" className="text-gray-600 hover:text-blue-600">Home</Link>
             <ChevronRight className="w-4 h-4 text-gray-400" />
-            <Link to="/" className="text-gray-600 hover:text-blue-600">All Phone Models</Link>
+            <Link to="/device-catalog" className="text-gray-600 hover:text-blue-600">All Phone Models</Link>
             <ChevronRight className="w-4 h-4 text-gray-400" />
             <span className="text-blue-600">{model}</span>
           </div>

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Home, Clock, Wrench, HelpCircle } from 'lucide-react';
 
 const menuItems = [
-  { name: 'Home', icon: Home, path: '/' },
+  { name: 'Home', icon: Home, path: '/home' },
   // { name: 'Order Status', icon: Clock, path: '/order-status' },
   { name: 'Services', icon: Wrench, path: '/services' },
   { name: 'Help', icon: HelpCircle, path: '/help' },
@@ -22,7 +22,7 @@ export default function Navigation() {
     >
       <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
         <div className="flex justify-between items-center">
-          <Link to="/">
+          <Link to="/home">
             <motion.div 
               className="flex items-center space-x-2"
               whileHover={{ scale: 1.05 }}
@@ -32,6 +32,7 @@ export default function Navigation() {
                 src="logo2.png" 
                 alt="iUnlockExpert Logo" 
                 className="w-45 h-10 md:w-45 md:h-10"
+                
               />
               {/* <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">
                 iUnlockExpert

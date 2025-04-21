@@ -27,7 +27,7 @@ export default function Footer() {
               {/* <span className="text-2xl font-bold">iUnlockExpert</span> */}
             </motion.div>
             <p className="text-gray-400 mb-6">
-              Your trusted phone unlocking service provider since 2024. We offer professional unlocking solutions for all Apple devices.
+              Your trusted phone unlocking service provider since 2021. We offer professional unlocking solutions for all Apple devices.
             </p>
           </div>
 
@@ -36,7 +36,7 @@ export default function Footer() {
             <h4 className="text-lg font-semibold mb-6">Quick Links</h4>
             <ul className="space-y-3">
               <li>
-                <Link to="/" className="text-gray-400 hover:text-white transition-colors duration-300">
+                <Link to="/home" className="text-gray-400 hover:text-white transition-colors duration-300">
                   Home
                 </Link>
               </li>
@@ -45,11 +45,11 @@ export default function Footer() {
                   Services
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link to="/order-status" className="text-gray-400 hover:text-white transition-colors duration-300">
                   Track Order
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link to="/help" className="text-gray-400 hover:text-white transition-colors duration-300">
                   Help Center
