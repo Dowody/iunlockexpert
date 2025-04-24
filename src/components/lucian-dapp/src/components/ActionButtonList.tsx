@@ -1,6 +1,6 @@
 import { useDisconnect, useAppKit, useAppKitNetwork, useAppKitAccount, useAppKitProvider, useAppKitNetworkCore, type Provider  } from '@reown/appkit/react'
 import { BrowserProvider, JsonRpcSigner,parseUnits, formatEther } from 'ethers'
-import { networks } from '../config'
+import { networks } from './config'
 
 // test transaction
 const TEST_TX = {
