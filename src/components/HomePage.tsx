@@ -1,3 +1,5 @@
+import { useConnect } from "thirdweb/react";
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -23,18 +25,12 @@ import 'swiper/css/autoplay';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 
-
-
 const appleDevices = {
   iphone: [
     { model: "iPhone 16 Pro Max", price: "$74.99", image: "https://lcdn.altex.ro/resize/media/catalog/product/i/p/16fa6a9aef7ffd6209d5fd9338ffa0b1/iphone_16_pro_max_desert_1_539c7c47.jpg" },
     { model: "iPhone 8 Plus", price: "$34.99", image: "https://i5.walmartimages.com/asr/61cbeba7-8bca-4062-b278-673019d304f8_1.44b845bf2c88872f7c7310a0d40bc0e7.jpeg" },
     { model: "iPhone 12 Pro", price: "$49.99", image: "https://alo.md/media/media/enter-apple-iphone-12-pro-158-mkstzqh.webp" },
     { model: "iPhone 16", price: "$59.99", image: "https://lcdn.altex.ro/resize/media/catalog/product/i/p/16fa6a9aef7ffd6209d5fd9338ffa0b1/iphone_16_ultramarine_1_2598b2a3.jpg" },
-    { model: "iPhone 15 Pro Max", price: "$69.99", image: "https://cdn0.it4profit.com/s3size/rt:fill/w:900/h:900/g:no/el:1/f:webp/plain/s3://cms/product/86/e8/86e83cf2fedc8ed7ad4ddb3452d06b66/250331120227455325.webp" },
-    { model: "iPhone 15 Pro", price: "$64.99", image: "https://lcdn.altex.ro/resize/media/catalog/product/i/p/16fa6a9aef7ffd6209d5fd9338ffa0b1/iphone_15_pro_natural_titanium_pdp_image_position_1_wwen_fc0946e7.jpg" },
-    { model: "iPhone 11", price: "$39.99", image: "https://alo.md/media/media/seoimagesiphone-11-4-gb-128-gb-black-026-luwndcv-1.webp" },
-    { model: "iPhone 15", price: "$54.99", image: "https://lcdn.altex.ro/media/catalog/product/a/p/apple_iphone_15_black_1_7416a980.jpg" },
     { model: "iPhone 14 Pro Max", price: "$64.99", image: "https://lcdn.altex.ro/resize/media/catalog/product/i/p/16fa6a9aef7ffd6209d5fd9338ffa0b1/iphone_14_pro_silver-1_56a46342.jpg" },
     { model: "iPhone SE (3rd gen)", price: "$34.99", image: "https://www.goblue.dk/images/Apple%20iPhone%20SE%202022%205G%2064GB%20-%20Red%2001-p.jpg" },
     { model: "iPhone XR", price: "$34.99", image: "https://i2.storeland.net/3/634/206336045/afacdb/smartfon-apple-iphone-xr.jpg" },
@@ -107,8 +103,6 @@ const benefits = [
   }
 ];
 
-
-
 const trustpilotReviews = [
   {
     name: "Sarah Mitchell",
@@ -178,7 +172,10 @@ const HomePage: React.FC = () => {
       <div className="bg-gradient-to-b from-blue-50 to-white py-12" >
         <IMEIChecker />
       </div>
-      
+
+     
+
+     
       <div className="container mx-auto px-4 py-8 mt-7"  id="devices-section">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -285,14 +282,13 @@ const HomePage: React.FC = () => {
                 className="w-full h-40 object-contain"
               />
               <div className="p-4">
-                <h3 className="text-sm font-semibold mb-2 line-clamp-2">{device.model}</h3>
+                <h3 className="text-sm font-semibold mb-2 line-clamp-2 text-center">{device.model}</h3>
                 <div className="flex justify-between items-center">
-                  <span className="text-blue-600 font-semibold">{device.price}</span>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleDeviceUnlock(device.model)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition-colors duration-300"
+                    className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 m-auto transition-colors duration-300"
                   >
                     Unlock Now
                   </motion.button>
@@ -312,7 +308,7 @@ const HomePage: React.FC = () => {
             whileTap={{ scale: 0.95 }}
             className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300"
           >
-            <span>See All Devices</span>
+            <span>Find Your Device</span>
             <ArrowRight className="w-5 h-5" />
           </motion.button>
         </div>

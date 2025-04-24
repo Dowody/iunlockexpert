@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import http from 'http';
 import WebSocket from 'ws';
-import { processMessage } from './chatbot';  // Assuming chatbot processing function is in chatbot.js
+import { processMessage } from './chatbot'; 
 
 dotenv.config();
 

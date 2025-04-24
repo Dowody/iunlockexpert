@@ -248,7 +248,7 @@ const DeviceCatalog: React.FC = () => {
   >
     <div className="flex items-center space-x-4 mb-4">
       <HelpCircle className="w-8 h-8 text-blue-600" />
-      <h2 className="text-center text-2xl font-semibold text-blue-900">
+      <h2 className="text-2xl font-semibold text-blue-900">
         How to Unlock Your Device
       </h2>
     </div>
@@ -401,14 +401,13 @@ const DeviceCatalog: React.FC = () => {
                 className="w-full h-40 object-contain"
               />
               <div className="p-4">
-                <h3 className="text-sm font-semibold mb-2 line-clamp-2">{device.model}</h3>
+                <h3 className="text-sm font-semibold text-center mb-2 line-clamp-2">{device.model}</h3>
                 <div className="flex justify-between items-center">
-                  <span className="text-blue-600 font-semibold">{device.price}</span>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleDeviceUnlock(device.model)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition-colors duration-300"
+                    className="bg-blue-600 text-white px-4 py-2 rounded m-auto text-sm hover:bg-blue-700 transition-colors duration-300"
                   >
                     Unlock Now
                   </motion.button>

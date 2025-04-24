@@ -12,7 +12,7 @@ import IcloudUnlockPage from './components/icloudUnlockPage';
 import MdmBypassPage from './components/MdmBypassPage';
 import SimUnlockPage from './components/SimUnlockPage';
 import IMEICheckPage from './components/IMEICheckPage';
-
+import WhatsAppButton from './components/WhatsAppButton';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -28,6 +28,9 @@ function App() {
   return (
     <>
       <ScrollToTop />
+      <div className="fixed top-4 right-4 z-50">
+        {/* You can add the WhatsApp button here */}
+      </div>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/unlock/:model" element={<DeviceUnlock />} />
@@ -42,7 +45,7 @@ function App() {
         <Route path="/services/sim-unlock" element={<SimUnlockPage />} />
         <Route path="/imei-check" element={<IMEICheckPage />} />
       </Routes>
-
+      <WhatsAppButton />
     </>
   );
 }
