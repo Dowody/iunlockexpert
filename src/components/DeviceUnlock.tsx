@@ -550,7 +550,7 @@ const WalletPaymentModal = () => (
                     if (service.type === 'sim-unlock') {
                       setStep(2); // Go to carrier selection for SIM unlock
                     } else {
-                      setStep(2); // Go to details for other services
+                      setStep(3); // Go to details for other services
                     }
                   }}
                 >
@@ -627,14 +627,18 @@ const WalletPaymentModal = () => (
                   </button>
                 ))}
               </div>
+              
 
               <AnimatePresence>
                 {showCancelModal && <CancelModal />}
               </AnimatePresence>
             </div>
+
+            
           );
         }
         
+      case 3:
         // Details form for MDM and iCloud
         return (
           <div>
@@ -729,7 +733,7 @@ const WalletPaymentModal = () => (
                     }
                     
                     if (!imeiValidation && !emailValidation) {
-                      setStep(3);
+                      setStep(4);
                     }
                   }}
                   className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
@@ -745,7 +749,7 @@ const WalletPaymentModal = () => (
           </div>
         );
 
-      case 3:
+      case 4:
         return (
           <div>
             {renderServiceSummaryBar()}
@@ -824,7 +828,7 @@ const WalletPaymentModal = () => (
               
               <div className="mt-6">
                 <button
-                  onClick={() => setStep(4)}
+                  onClick={() => setStep(5)}
                   className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
                 >
                   Proceed to Payment
@@ -838,7 +842,7 @@ const WalletPaymentModal = () => (
           </div>
         );
 
-        case 4:
+        case 5:
   return (
     <div>
       {renderServiceSummaryBar()}
