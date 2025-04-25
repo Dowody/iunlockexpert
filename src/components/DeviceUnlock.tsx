@@ -17,12 +17,12 @@ createAppKit({
   networks,
   metadata,
   projectId,
-  themeMode: 'dark',
+  themeMode: 'light',
   features: {
     analytics: true // Optional - defaults to your Cloud configuration
   },
   themeVariables: {
-    '--w3m-accent': '#FFFFFF',
+    '--w3m-accent': '#000000',
   }
 })
 
