@@ -10,11 +10,13 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateReceipt } from '../utils/generateReceipt';
-import { createAppKit } from '@reown/appkit/react'
+import { createAppKit, useAppKit, useAppKitAccount, useAppKitProvider, useAppKitNetworkCore } from '@reown/appkit/react'
 import { networks, projectId, metadata, ethersAdapter } from './config';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import { bsc, mainnet } from 'viem/chains';
 import WhatsAppButton from './WhatsAppButton';
+import { BrowserProvider, JsonRpcSigner, parseEther } from 'ethers';
+import type { Provider } from '@reown/appkit/react';
 
 createAppKit({
   adapters: [ethersAdapter],
@@ -79,7 +81,7 @@ const services: UnlockService[] = [
     originalPrice: 69.99,
     discountedPrice: 49.99,
     averageTime: "24-48 hours",
-    deliveryTime: "2 business days",
+    deliveryTime: "24 hours guaranteed",
     successRate: "99.9%",
     description: "Unlock iCloud-locked Apple devices",
     detailedDescription: "Stuck with an iCloud-locked device? Our professional iCloud unlock service helps you regain full access to your Apple device. We use official methods to remove iCloud activation locks, ensuring your device's integrity and functionality.",
@@ -98,7 +100,7 @@ const services: UnlockService[] = [
     originalPrice: 49.95,
     discountedPrice: 29.99,
     averageTime: "3-5 days",
-    deliveryTime: "3 business days",
+    deliveryTime: "24 hours guaranteed",
     successRate: "99.9%",
     description: "Carrier unlock for mobile devices",
     detailedDescription: "Free your device from carrier restrictions. Our SIM unlock service allows you to use your phone with any carrier worldwide. We provide a permanent unlock that works across international networks.",
@@ -123,13 +125,13 @@ const cryptoPayments = [
     name: "Ethereum",
     symbol: "ETH",
     discount: 8,
-    address: "bc1q0jjym5ylv66epkmdwu9qxj2cpnemguwtvy7c9d"
+    address: "0x9394CD307B4c1C37a0F4713CbD222238c077209a"
   },
   {
-    name: "USDT",
+    name: "USDT TRC-20",
     symbol: "USDT",
     discount: 5,
-    address: "0x9394CD307B4c1C37a0F4713CbD222238c077209a"
+    address: "TU4mc5DHHk4eyob4zQArsbiHnVRCFGYDDH"
   }
 ];
 
@@ -153,8 +155,24 @@ export default function DeviceUnlock() {
   const [imeiError, setImeiError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentError, setPaymentError] = useState("");
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
+
+  // AppKit hooks
+  const { open } = useAppKit();
+  const { isConnected, address } = useAppKitAccount();
+  const { walletProvider } = useAppKitProvider<Provider>('eip155');
+  const { chainId } = useAppKitNetworkCore();
+
+  // Update wallet connection state when isConnected changes
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+
+  useEffect(() => {
+    setIsWalletConnected(isConnected);
+  }, [isConnected]);
 
   // Validation methods
   const validateIMEI = (imei: string) => {
@@ -186,159 +204,266 @@ export default function DeviceUnlock() {
     return "";
   };
 
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
-
   const [isWalletPaymentModalOpen, setIsWalletPaymentModalOpen] = useState(false);
-const [selectedCryptoMethod, setSelectedCryptoMethod] = useState<string | null>(null);
+  const [selectedCryptoMethod, setSelectedCryptoMethod] = useState<string | null>(null);
 
-const WalletPaymentModal = () => (
-  <AnimatePresence>
-    {isWalletPaymentModalOpen && (
-      <motion.div
-        initial={{ opacity: 1 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 1 }}
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-      >
+  const handleWalletPayment = async () => {
+    if (!isConnected || !walletProvider || !address) {
+      setPaymentError('Please connect your wallet first');
+      return;
+    }
+
+    setIsProcessingPayment(true);
+    setPaymentError(null);
+    setPaymentSuccess(false);
+    setTransactionHash(null);
+
+    // Calculate amount outside try block so it's accessible in catch block
+    const amountInEth = ((selectedService?.discountedPrice || 0) + (includeBlacklistCheck ? 2.95 : 0)) / 2000;
+
+    try {
+      // Create provider and signer
+      const provider = new BrowserProvider(walletProvider, chainId);
+      const signer = new JsonRpcSigner(provider, address);
+
+      // Prepare transaction
+      const transaction = {
+        to: "0x9394CD307B4c1C37a0F4713CbD222238c077209a", // Your receiving address
+        value: parseEther(amountInEth.toString())
+      };
+
+      // Send transaction
+      const tx = await signer.sendTransaction(transaction);
+      
+      // Wait for transaction to be mined
+      const receipt = await tx.wait();
+      
+      if (receipt?.status === 1) {
+        setPaymentSuccess(true);
+        setTransactionHash(tx.hash);
+        
+        // Generate receipt
+        const receiptData = {
+          orderId: `ORDER-${Date.now()}`,
+          service: selectedService?.name || '',
+          device: model || '',
+          amount: amountInEth,
+          originalPrice: selectedService?.originalPrice || 0,
+          discount: selectedService?.originalPrice ? selectedService.originalPrice - selectedService.discountedPrice : 0,
+          finalPrice: selectedService?.discountedPrice || 0,
+          paymentMethod: 'WalletConnect',
+          transactionHash: tx.hash,
+          date: new Date().toISOString(),
+          imei: imei,
+          email: email
+        };
+        
+        await generateReceipt(receiptData);
+        
+        // Close modal after successful payment
+        setTimeout(() => {
+          setIsWalletPaymentModalOpen(false);
+          setStep(6); // Move to success step
+        }, 2000);
+      } else {
+        throw new Error('Transaction failed');
+      }
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      
+      // Handle specific error types
+      if (error.code === 'INSUFFICIENT_FUNDS') {
+        setPaymentError(
+          `Insufficient funds in your wallet. Please ensure you have enough ETH to cover the payment amount (${amountInEth} ETH) plus gas fees.`
+        );
+      } else if (error.code === 'USER_REJECTED') {
+        setPaymentError('Transaction was rejected. Please try again if you want to proceed with the payment.');
+      } else if (error.code === 'NETWORK_ERROR') {
+        setPaymentError('Network error occurred. Please check your internet connection and try again.');
+      } else if (error.message?.includes('gas')) {
+        setPaymentError('Transaction failed due to gas estimation. Please try again with a different gas price.');
+      } else {
+        // Extract a more readable error message if available
+        const errorMessage = error.error?.message || error.message || 'Transaction failed';
+        const readableError = errorMessage
+          .replace(/failed with \d+ gas: /, '')
+          .replace(/address 0x[a-fA-F0-9]{40}/, 'your wallet')
+          .replace(/have \d+ want \d+/, 'have insufficient funds');
+        
+        setPaymentError(`Payment failed: ${readableError}`);
+      }
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
+  const WalletPaymentModal = () => (
+    <AnimatePresence>
+      {isWalletPaymentModalOpen && (
         <motion.div
-          initial={{ scale: 1, opacity: 1 }}
-          animate={{ scale: 0.98, opacity: 1 }}
-          exit={{ scale: 0.1, opacity: 1 }}
-          transition={{ duration: 0.4 }} // Transition time set to 0.5 seconds
-
-          className="bg-white rounded-xl shadow-2xl max-w-md w-full"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 1 }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
         >
-          {/* Header */}
-          <div className="bg-blue-600 text-white p-6 rounded-t-xl">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold">WalletConnect Payment</h2>
-              <button 
-                onClick={() => setIsWalletPaymentModalOpen(false)}
-                className="text-white hover:text-blue-100"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            <p className="text-sm text-blue-100 mt-2">
-              Complete your payment for {selectedService?.name}
-            </p>
-            <div className="mt-2 text-2xl font-bold">
-              €{(
-                (selectedService?.discountedPrice || 0) + 
-                (includeBlacklistCheck ? 2.95 : 0)
-              ).toFixed(2)}
-            </div>
-          </div>
-
-          {/* Order Summary */}
-          <div className="p-6 border-b">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600">Device</p>
-                <p className="font-semibold">{model}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">IMEI</p>
-                <p className="font-semibold">{imei}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Service</p>
-                <p className="font-semibold">{selectedService?.name}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Processing Time</p>
-                <p className="font-semibold">{selectedService?.deliveryTime}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Crypto Method Selection */}
-          <div className="p-6 border-b">
-            <h3 className="text-md font-semibold mb-3">Select Cryptocurrency</h3>
-            <div className="grid grid-cols-3 gap-3"
-      >
-              {cryptoPayments.map((crypto) => (
-                <motion.button
-                  key={crypto.symbol}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    setSelectedCryptoMethod(crypto.symbol);
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`p-4 border rounded-lg transition-all ${
-                    selectedCryptoMethod === crypto.symbol 
-                      ? 'border-blue-600 bg-blue-50' 
-                      : 'border-gray-200 hover:border-blue-300'
-                  }`}
+          <motion.div
+            initial={{ scale: 1, opacity: 1 }}
+            animate={{ scale: 0.98, opacity: 1 }}
+            exit={{ scale: 0.1, opacity: 1 }}
+            transition={{ duration: 0.4 }}
+            className="bg-white rounded-xl shadow-2xl max-w-md w-full"
+          >
+            {/* Header */}
+            <div className="bg-blue-600 text-white p-6 rounded-t-xl">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold">WalletConnect Payment</h2>
+                <button 
+                  onClick={() => setIsWalletPaymentModalOpen(false)}
+                  className="text-white hover:text-blue-100"
                 >
-                  <div className="flex flex-col items-center">
-                    <span className="font-semibold">{crypto.symbol}</span>
-                    <span className="text-xs text-green-600">
-                      Save {crypto.discount}%
-                    </span>
-                  </div>
-                </motion.button>
-              ))}
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <p className="text-sm text-blue-100 mt-2">
+                Complete your payment for {selectedService?.name}
+              </p>
+              <div className="mt-2 text-2xl font-bold">
+                €{(
+                  (selectedService?.discountedPrice || 0) + 
+                  (includeBlacklistCheck ? 2.95 : 0)
+                ).toFixed(2)}
+              </div>
             </div>
-          </div>
 
-          {/* Wallet Connect */}
-          <AnimatePresence>
-            {selectedCryptoMethod && (
-              <motion.div
-                initial={{ opacity: 1, height: 0 }}
-                animate={{ opacity: 1, height: 0 }}
-                exit={{ opacity: 1, height: 0 }}
-                className="p-6 pb-28 border-b"
-              >
-                <h3 className="text-md font-semibold mb-6">Connect Your Wallet</h3>
-                <div className="">
-                  <appkit-button />
+            {/* Order Summary */}
+            <div className="p-6 border-b">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-600">Device</p>
+                  <p className="font-semibold">{model}</p>
                 </div>
+                <div>
+                  <p className="text-sm text-gray-600">IMEI</p>
+                  <p className="font-semibold">{imei}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Service</p>
+                  <p className="font-semibold">{selectedService?.name}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Unlock Time</p>
+                  <p className="font-semibold">{selectedService?.deliveryTime}</p>
+                </div>
+              </div>
+            </div>
 
-                {isWalletConnected && (
-                  <motion.div 
-                    initial={{ opacity: 1, y: 0 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-4 bg-green-50 p-4 rounded-lg flex items-center space-x-3"
-                  >
-                    <CheckCircle className="w-6 h-6 text-green-600" />
-                    <div>
-                      <p className="font-semibold text-green-800">
-                        Wallet Connected Successfully
-                      </p>
-                      <p className="text-sm text-green-700">
-                        You can now proceed with the transaction
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Pay Button */}
-          <div className="p-6">
-            <button
-              onClick={handleWalletPayment}
-              disabled={!selectedCryptoMethod || !isWalletConnected}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg 
-                hover:bg-blue-700 transition-colors
-                disabled:opacity-50 disabled:cursor-not-allowed"
+            {/* Crypto Method Selection */}
+            <div className="p-6 border-b">
+              <h3 className="text-md font-semibold mb-3">Select Cryptocurrency</h3>
+              <div className="grid grid-cols-3 gap-3"
             >
-              Pay €{(
-                (selectedService?.discountedPrice || 0) + 
-                (includeBlacklistCheck ? 2.95 : 0)
-              ).toFixed(2)}
-            </button>
-          </div>
-        </motion.div>
-      </motion.div>
-    )}
-  </AnimatePresence>
-);
+                {cryptoPayments.map((crypto) => (
+                  <motion.button
+                    key={crypto.symbol}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setSelectedCryptoMethod(crypto.symbol);
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`p-4 border rounded-lg transition-all ${
+                      selectedCryptoMethod === crypto.symbol 
+                        ? 'border-blue-600 bg-blue-50' 
+                        : 'border-gray-200 hover:border-blue-300'
+                    }`}
+                  >
+                    <div className="flex flex-col items-center">
+                      <span className="font-semibold">{crypto.symbol}</span>
+                      <span className="text-xs text-green-600">
+                        {/* Save {crypto.discount}% */}
+                      </span>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
 
+            {/* Wallet Connect */}
+            <AnimatePresence>
+              {selectedCryptoMethod && (
+                <motion.div
+                  initial={{ opacity: 1, height: 0 }}
+                  animate={{ opacity: 1, height: 0 }}
+                  exit={{ opacity: 1, height: 0 }}
+                  className="p-6 pb-52 border-b"
+                >
+                  <h3 className="text-md font-semibold mb-6">Connect Your Wallet</h3>
+                  <div className="">
+                    <appkit-button />
+                  </div>
+
+                  {isWalletConnected && (
+                    <motion.div 
+                      initial={{ opacity: 1, y: 0 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-4 bg-green-50 p-4 rounded-lg flex items-center space-x-3"
+                    >
+                      <CheckCircle className="w-6 h-6 text-green-600" />
+                      <div>
+                        <p className="font-semibold text-green-800">
+                          Wallet Connected Successfully
+                        </p>
+                        <p className="text-sm text-green-700">
+                          You can now proceed with the transaction
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Pay Button */}
+            <div className="p-6">
+              <button
+                onClick={handleWalletPayment}
+                disabled={!selectedCryptoMethod || !isWalletConnected || isProcessingPayment}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg 
+                  hover:bg-blue-700 transition-colors
+                  disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isProcessingPayment ? (
+                  <div className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing Payment...
+                  </div>
+                ) : !isWalletConnected ? (
+                  'Connect Wallet to Pay'
+                ) : (
+                  `Pay €${((selectedService?.discountedPrice || 0) + (includeBlacklistCheck ? 2.95 : 0)).toFixed(2)}`
+                )}
+              </button>
+
+              {paymentError && (
+                <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+                  {paymentError}
+                </div>
+              )}
+
+              {paymentSuccess && (
+                <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm">
+                  Payment successful! Transaction hash: {transactionHash}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -364,30 +489,10 @@ const WalletPaymentModal = () => (
     setShowCancelModal(true);
   };
 
-
   const [selectedCrypto, setSelectedCrypto] = useState(cryptoPayments[0].symbol);
-
-
-  const handleWalletPayment = async () => {
-    try {
-      const totalAmount = (
-        (selectedService?.discountedPrice || 0) + 
-        (includeBlacklistCheck ? 2.95 : 0)
-      ).toFixed(2);
-  
-      // Implement actual wallet payment logic
-      console.log(`Paying ${totalAmount} for ${selectedService?.name}`);
-    } catch (error) {
-      console.error('Payment failed', error);
-      // Handle payment error
-    }
-  };
-  
-  
 
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   
-
   const confirmCancel = () => {
     // Reset all state
     setStep(1);
@@ -903,7 +1008,7 @@ const WalletPaymentModal = () => (
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Processing Time:</span>
+                  <span className="text-gray-600">Unlock Time:</span>
                   <span className="font-medium">{selectedService?.deliveryTime}</span>
                 </div>
                 <div className="flex justify-between">
@@ -1022,7 +1127,7 @@ const WalletPaymentModal = () => (
                     <div className="flex justify-between items-center mb-3">
                       <h4 className="font-semibold text-base">{crypto.name}</h4>
                       <span className="text-green-600 text-sm">
-                        Save {crypto.discount}%
+                        {/* Save {crypto.discount}% */}
                       </span>
                     </div>
                     
