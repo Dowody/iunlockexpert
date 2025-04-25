@@ -202,8 +202,10 @@ const WalletPaymentModal = () => (
       >
         <motion.div
           initial={{ scale: 1, opacity: 1 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 1 }}
+          animate={{ scale: 0.98, opacity: 1 }}
+          exit={{ scale: 0.1, opacity: 1 }}
+          transition={{ duration: 0.4 }} // Transition time set to 0.5 seconds
+
           className="bg-white rounded-xl shadow-2xl max-w-md w-full"
         >
           {/* Header */}
@@ -257,9 +259,6 @@ const WalletPaymentModal = () => (
       >
               {cryptoPayments.map((crypto) => (
                 <motion.button
-                initial={{ scale: 0.98, opacity: 1 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 1 }}
                   key={crypto.symbol}
                   onClick={(event) => {
                     event.preventDefault();
