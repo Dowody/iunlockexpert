@@ -218,17 +218,22 @@ export default function DeviceUnlock() {
     setPaymentSuccess(false);
     setTransactionHash(null);
 
-    // Calculate amount outside try block so it's accessible in catch block
-    const amountInEth = ((selectedService?.discountedPrice || 0) + (includeBlacklistCheck ? 2.95 : 0)) / 2000;
-
     try {
+      // Calculate amount in ETH with proper decimal handling
+      const euroAmount = (selectedService?.discountedPrice || 0) + (includeBlacklistCheck ? 2.95 : 0);
+      const amountInEth = Number((euroAmount / 2000).toFixed(8)); // Round to 8 decimal places
+      
+      if (isNaN(amountInEth) || amountInEth <= 0) {
+        throw new Error('Invalid payment amount');
+      }
+
       // Create provider and signer
       const provider = new BrowserProvider(walletProvider, chainId);
       const signer = new JsonRpcSigner(provider, address);
 
-      // Prepare transaction
+      // Prepare transaction with properly formatted amount
       const transaction = {
-        to: "0x9394CD307B4c1C37a0F4713CbD222238c077209a", // Your receiving address
+        to: "0x9394CD307B4c1C37a0F4713CbD222238c077209a",
         value: parseEther(amountInEth.toString())
       };
 
@@ -274,12 +279,14 @@ export default function DeviceUnlock() {
       // Handle specific error types
       if (error.code === 'INSUFFICIENT_FUNDS') {
         setPaymentError(
-          `Insufficient funds in your wallet. Please ensure you have enough ETH to cover the payment amount (${amountInEth} ETH) plus gas fees.`
+          `Insufficient funds in your wallet. Please ensure you have enough ETH to cover the payment amount plus gas fees.`
         );
       } else if (error.code === 'USER_REJECTED') {
         setPaymentError('Transaction was rejected. Please try again if you want to proceed with the payment.');
       } else if (error.code === 'NETWORK_ERROR') {
         setPaymentError('Network error occurred. Please check your internet connection and try again.');
+      } else if (error.code === 'NUMERIC_FAULT') {
+        setPaymentError('There was an issue with the payment amount. Please try again or contact support.');
       } else if (error.message?.includes('gas')) {
         setPaymentError('Transaction failed due to gas estimation. Please try again with a different gas price.');
       } else {
@@ -288,7 +295,8 @@ export default function DeviceUnlock() {
         const readableError = errorMessage
           .replace(/failed with \d+ gas: /, '')
           .replace(/address 0x[a-fA-F0-9]{40}/, 'your wallet')
-          .replace(/have \d+ want \d+/, 'have insufficient funds');
+          .replace(/have \d+ want \d+/, 'have insufficient funds')
+          .replace(/too many decimals for format.*/, 'Invalid payment amount. Please try again.');
         
         setPaymentError(`Payment failed: ${readableError}`);
       }
