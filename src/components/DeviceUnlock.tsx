@@ -1014,33 +1014,34 @@ const WalletPaymentModal = () => (
                 </div>
 
                 {/* Cryptocurrency Addresses */}
-                <div className="grid md:grid-cols-3 gap-4">
-                  {cryptoPayments.map((crypto) => (
-                    <div 
-                      key={crypto.name}
-                      className="bg-white border rounded-lg p-4"
-                    >
-                      <div className="flex justify-between items-center mb-3">
-                        <h4 className="font-semibold">{crypto.name}</h4>
-                        <span className="text-green-600 text-sm">
-                          Save {crypto.discount}%
-                        </span>
-                      </div>
-                      
-                      <div className="bg-gray-50 rounded p-2 mb-3">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-600 text-sm">
-                            Wallet Address:
-                          </span>
-                          <CopyButton text={crypto.address} />
-                        </div>
-                        <code className="block text-xs text-gray-700 break-words">
-                          {crypto.address}
-                        </code>
-                      </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {cryptoPayments.map((crypto) => (
+                  <div 
+                    key={crypto.name}
+                    className="bg-white border rounded-lg p-4 w-full"
+                  >
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="font-semibold text-base">{crypto.name}</h4>
+                      <span className="text-green-600 text-sm">
+                        Save {crypto.discount}%
+                      </span>
                     </div>
-                  ))}
-                </div>
+                    
+                    <div className="bg-gray-50 rounded p-2 mb-3">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-gray-600 text-sm">
+                          Wallet Address:
+                        </span>
+                        <CopyButton text={crypto.address} />
+                      </div>
+                      <code className="block text-xs text-gray-700 break-words overflow-x-auto max-w-full whitespace-nowrap">
+                        {crypto.address}
+                      </code>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
 
                 {/* Support Contact */}
                 <div className="bg-gray-50 border rounded-lg p-4 text-center">
