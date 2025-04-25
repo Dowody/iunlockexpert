@@ -70,7 +70,7 @@ const services: Service[] = [
   {
     id: 1,
     title: "Basic Check",
-    price: "$0.06",
+    price: "",
     description: "Essential device information and basic status check",
     features: [
       "Basic Device Info",
