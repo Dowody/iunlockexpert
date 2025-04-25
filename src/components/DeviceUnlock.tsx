@@ -98,7 +98,7 @@ const services: UnlockService[] = [
     name: "SIM Unlock",
     icon: GlobeLock,
     originalPrice: 49.95,
-    discountedPrice: 29.99,
+    discountedPrice: 4.99,
     averageTime: "3-5 days",
     deliveryTime: "24 hours guaranteed",
     successRate: "99.9%",
