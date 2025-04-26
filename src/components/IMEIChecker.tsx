@@ -198,7 +198,7 @@ export default function IMEIChecker() {
         },
         body: JSON.stringify({
           deviceId: cleanIMEI,
-          serviceId: selectedService
+          serviceId: 1
         })
       });
 
@@ -391,7 +391,7 @@ export default function IMEIChecker() {
         </div>
 
         {/* Advanced Service - Level 2 */}
-        {selectedService >= 2 && (
+        {selectedService >= 1 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {warrantyInfo}
             {serviceHistory}
@@ -400,7 +400,7 @@ export default function IMEIChecker() {
         )}
 
         {/* Full Service - Level 3 */}
-        {selectedService === 3 && (
+        {selectedService === 1 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {securityStatus}
             {lockStatus}
@@ -433,7 +433,7 @@ export default function IMEIChecker() {
 
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-              {services.map((service) => (
+              {/* {services.map((service) => (
                 <motion.div
                   key={service.id}
                   whileHover={{ scale: 1.02 }}
@@ -459,7 +459,7 @@ export default function IMEIChecker() {
                     ))}
                   </ul>
                 </motion.div>
-              ))}
+              ))} */}
             </div>
 
             <div className="relative mb-2">
