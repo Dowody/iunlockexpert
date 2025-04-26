@@ -1,4 +1,5 @@
 import { jsPDF } from 'jspdf';
+import QRCode from 'qrcode';
 
 interface ReceiptData {
   orderId: string;
@@ -11,112 +12,137 @@ interface ReceiptData {
   paymentMethod: string;
   email: string;
   imei: string;
+  transactionHash?: string;
 }
 
-export const generateReceipt = (data: ReceiptData): string => {
-  // Create new document
+export const generateReceipt = async (data: ReceiptData): Promise<void> => {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
     format: 'a4'
   });
 
-  // Set initial coordinates
-  let y = 20;
-  const leftMargin = 20;
+  // Generate QR Code for transaction verification
+  const qrCodeData = `Order ID: ${data.orderId}\nDevice: ${data.device}\nIMEI: ${data.imei}\nTransaction Hash: ${data.transactionHash}`;
+  const qrCodeImage = await QRCode.toDataURL(qrCodeData);
+
+  // Page setup
   const pageWidth = doc.internal.pageSize.width;
-  const lineHeight = 7;
+  const pageHeight = doc.internal.pageSize.height;
+  const margin = 15;
 
-  // Helper function for centered text
-  const centerText = (text: string, y: number) => {
-    const textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
-    const x = (pageWidth - textWidth) / 2;
-    doc.text(text, x, y);
-  };
-
-  // Add company logo placeholder
-  doc.setFontSize(24);
-  doc.setTextColor(0, 87, 183); // Blue color
-  centerText('iUnlockExpert', y);
-
-  // Add receipt title
-  y += 15;
-  doc.setFontSize(16);
-  doc.setTextColor(0, 0, 0);
-  centerText('Payment Receipt', y);
-
-  // Add horizontal line
-  y += 5;
-  doc.setLineWidth(0.5);
-  doc.line(leftMargin, y, pageWidth - leftMargin, y);
-
-  // Reset font for content
+  // Company Logo and Header
   doc.setFontSize(10);
-  y += 10;
+  doc.setTextColor(50);
+  
+  // Company Logo Placeholder (you can replace with actual logo)
+  doc.setFont('helvetica', 'bold');
+  doc.text('iUnlockExpert', margin, 20);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Professional Device Unlock Services', margin, 25);
+  doc.text('support@iunlockexpert.com', margin, 30);
 
-  // Add receipt details
-  const addField = (label: string, value: string) => {
-    doc.setFont('helvetica', 'normal');
-    doc.text(label, leftMargin, y);
+  // Horizontal Line
+  doc.setLineWidth(0.5);
+  doc.line(margin, 35, pageWidth - margin, 35);
+
+  // Receipt Title
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('PAYMENT RECEIPT', pageWidth / 2, 45, { align: 'center' });
+
+  // Order Details
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  let y = 55;
+  
+  const addDetailRow = (label: string, value: string) => {
     doc.setFont('helvetica', 'bold');
-    doc.text(value, leftMargin + 40, y);
-    y += lineHeight;
+    doc.text(label, margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(value, pageWidth - margin, y, { align: 'right' });
+    y += 6;
   };
 
-  // Order information
-  doc.setFont('helvetica', 'bold');
-  doc.text('Order Information', leftMargin, y);
-  y += lineHeight;
+  addDetailRow('Order ID:', data.orderId);
+  addDetailRow('Date:', new Date(data.date).toLocaleString());
+  addDetailRow('Email:', data.email);
 
-  addField('Order ID:', data.orderId);
-  addField('Date:', data.date);
-  addField('Email:', data.email);
-
-  // Device information
-  y += 5;
-  doc.setFont('helvetica', 'bold');
-  doc.text('Device Information', leftMargin, y);
-  y += lineHeight;
-
-  addField('Device:', data.device);
-  addField('IMEI:', data.imei);
-  addField('Service:', data.service);
-
-  // Payment details
-  y += 5;
-  doc.setFont('helvetica', 'bold');
-  doc.text('Payment Details', leftMargin, y);
-  y += lineHeight;
-
-  addField('Original Price:', `€${data.originalPrice.toFixed(2)}`);
-  addField('Discount:', `€${data.discount.toFixed(2)}`);
-  addField('Payment Method:', data.paymentMethod);
-
-  // Final amount
-  y += 5;
-  doc.setFillColor(240, 247, 255);
-  doc.rect(leftMargin, y, pageWidth - (leftMargin * 2), 12, 'F');
+  // Horizontal Line
+  doc.line(margin, y, pageWidth - margin, y);
   y += 8;
+
+  // Device Information Section
+  doc.setFont('helvetica', 'bold');
+  doc.text('DEVICE INFORMATION', margin, y);
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+  
+  addDetailRow('Device Model:', data.device);
+  addDetailRow('IMEI:', data.imei);
+  addDetailRow('Service:', data.service);
+
+  // Horizontal Line
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 8;
+
+  // Payment Details Section
+  doc.setFont('helvetica', 'bold');
+  doc.text('PAYMENT DETAILS', margin, y);
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+
+  addDetailRow('Original Price:', `€${data.originalPrice.toFixed(2)}`);
+  
+  // Discount in green
+  doc.setTextColor(0, 128, 0);
+  addDetailRow('Discount:', `-€${data.discount.toFixed(2)}`);
+  
+  // Reset text color
+  doc.setTextColor(50);
+  addDetailRow('Payment Method:', data.paymentMethod);
+
+  // Horizontal Line
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 8;
+
+  // Total Amount
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.text('Total Amount:', leftMargin + 2, y);
-  doc.text(`€${data.finalPrice.toFixed(2)}`, pageWidth - leftMargin - 25, y);
+  doc.text('TOTAL AMOUNT:', margin, y);
+  doc.text(`€${data.finalPrice.toFixed(2)}`, pageWidth - margin, y, { align: 'right' });
+  y += 10;
 
-  // Add footer
-  y = doc.internal.pageSize.height - 30;
+  // Transaction Hash
+  if (data.transactionHash) {
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Transaction Hash:', margin, y);
+    y += 5;
+    doc.text(data.transactionHash, margin, y, { maxWidth: pageWidth - (2 * margin) });
+  }
+
+  // QR Code
+  const qrCodeX = pageWidth - margin - 30;
+  const qrCodeY = pageHeight - margin - 30;
+  doc.addImage(qrCodeImage, 'PNG', qrCodeX, qrCodeY, 30, 30);
+
+  // Footer
   doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  centerText('Thank you for choosing iUnlockExpert for your device unlocking needs.', y);
-  y += 5;
-  centerText('This receipt serves as proof of payment. Please keep it for your records.', y);
-  y += 5;
-  centerText('For support, contact us at support@iunlockexpert.com', y);
+  doc.setTextColor(100);
+  doc.text('© 2024 iUnlockExpert. All rights reserved.', margin, pageHeight - 10);
+  doc.text('This is an official receipt for your records.', pageWidth - margin, pageHeight - 10, { align: 'right' });
 
-  // Add company details at the bottom
-  y += 5;
-  doc.setFontSize(7);
-  centerText('iUnlockExpert Inc. | 123 Tech Street, Digital City, 12345 | +1-800-UNLOCK-PRO', y);
+  // Watermark
+  doc.setTextColor(200);
+  doc.setFontSize(60);
+  doc.setFont('helvetica', 'bold');
+  doc.text('RECEIPT', pageWidth / 2, pageHeight / 2, { 
+    align: 'center', 
+    angle: -45
+  });
 
-  // Return the PDF as a data URL
-  return doc.output('datauristring');
+  // Directly trigger file download
+  const filename = `iUnlockExpert_Receipt_${data.orderId}.pdf`;
+  doc.save(filename);
 };

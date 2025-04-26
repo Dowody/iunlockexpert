@@ -6,7 +6,7 @@ import TermsAndConditions from './components/TermsAndConditions';
 import OrderStatus from './components/OrderStatus';
 import DeviceCatalog from './components/DeviceCatalog';
 import Help from './components/Help';
-import Receipt from './components/Receipt';
+
 import Services from './components/Services';
 import IcloudUnlockPage from './components/icloudUnlockPage';
 import MdmBypassPage from './components/MdmBypassPage';
@@ -39,7 +39,7 @@ function App() {
         <Route path="/order-status" element={<OrderStatus />} />
         <Route path="/device-catalog" element={<DeviceCatalog />} />
         <Route path="/help" element={<Help />} />
-        <Route path="/receipt" element={<Receipt />} />
+
         <Route path="/services/icloud-unlock" element={<IcloudUnlockPage />} />
         <Route path="/services/mdm-bypass" element={<MdmBypassPage />} />
         <Route path="/services/sim-unlock" element={<SimUnlockPage />} />
